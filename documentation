@@ -1,0 +1,111 @@
+ **Health & Wellness Planner Agent - Documentation**
+
+> 💡 **To run via CLI:**
+
+1. `.venv\Scripts\activate` *(to activate environment)*
+2. `uv run simplecli.py`
+
+> 💡 **To run via Chainlit:**
+
+1. `.venv\Scripts\activate` *(to activate environment)*
+2. `uv run chainlit run hello_chat.py`
+
+
+**Overview**
+
+**Health & Wellness Smart Assistant (Agent)** helps users improve their health by setting goals and giving support in the following areas:
+
+* 🍽️ **Nutrition**
+* 🏥 **Injury Recovery**
+* 🧠 **Mental Health**
+
+It interacts step-by-step in conversation, asking questions and using tools to provide helpful advice.
+
+---
+
+**🧩 Tools Description**
+
+**1. goal\_analyzer****
+
+**Purpose:** Understand the user's health goal.
+It asks the user to choose from:
+🍽️ Nutrition, 🏥 Injury Support, or 🧠 Mental Support.
+Based on the user's choice, it sets the goal type.
+
+**Example:**
+User says: "I want to eat healthier."
+→ Tool returns: **"Nutrition"**
+
+---
+
+**2. nutrition\_tool**
+
+**Purpose:** Gives healthy food tips or a simple meal plan.
+Takes the user’s dietary preferences or health goal and suggests suitable foods or meals.
+
+**Example:**
+Goal: "Nutrition"
+→ Tool replies: *"What help you want about—meal plan, weight loss, workout?"*
+
+---
+
+**3. meal\_planner**
+
+**Purpose:** Plans meals for a day or week.
+Asks user which meal type suits them (e.g., vegetarian or high-protein),
+then provides a weekly plan that matches the user’s goal and food preferences.
+
+**Example:**
+→ Tool gives a daily meal plan with food ideas.
+
+---
+
+**4. schedule**
+
+**Purpose:** Helps the user set a follow-up schedule.
+Suggests a next check-in time (e.g., 7 days later).
+If the user is not available, it asks for their preferred time and reschedules.
+
+**Example:**
+→ Suggests: *"Your next check-in is Tuesday, 5 PM. Does that work?"*
+
+---
+
+**5. injury\_support\_tool**
+
+**Purpose:** Supports recovery from physical injuries.
+Gives tips for rest, stretches, or when to see a doctor.
+
+**Example:**
+→ *"For a minor ankle sprain, try RICE: Rest, Ice, Compression, Elevation."*
+
+---
+
+**6. mental\_health\_tool**
+
+**Purpose:** Offers emotional or mental support.
+Provides relaxing tips, positive affirmations, or grounding exercises.
+
+**Example:**
+→ *"Try deep breathing or journaling for 10 minutes."*
+
+---
+
+**🧑‍💼 Main Agent Logic**
+
+**Agent Behavior:**
+
+* Greets the user.
+* Asks for the user’s name.
+* Calls **goal\_analyzer** to identify the goal.
+* Uses the appropriate tool:
+
+| Goal Type      | Tool Used                       |
+| -------------- | ------------------------------- |
+| Nutrition      | nutrition\_tool / meal\_planner |
+| Injury Support | injury\_support\_tool           |
+| Mental Support | mental\_health\_tool            |
+
+* Offers a follow-up schedule via **schedule tool**.
+* Ends with a kind closing message.
+
