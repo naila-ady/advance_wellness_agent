@@ -3,12 +3,12 @@
 > 💡 **To run via CLI:**
 
 1. `.venv\Scripts\activate` *(to activate environment)*
-2. `uv run simplecli.py`
+2. `uv run main.py`
 
-> 💡 **To run via Chainlit:**
+> 💡 **To run via streamlit:**
 
 1. `.venv\Scripts\activate` *(to activate environment)*
-2. `uv run chainlit run hello_chat.py`
+2. `streamlit runs strmlit.py`
 
 
 **Overview**

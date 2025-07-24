@@ -34,7 +34,6 @@ Orchestrator_agent = Agent(
     ],
 )
 
-# Page setup
 st.set_page_config(page_title="Health & Wellness Chat", page_icon="💬")
 st.title("Health & Wellness Planner Agent")
 st.markdown("""
@@ -48,39 +47,35 @@ Please choose your goal category:
 - 🤕 Injury Support  
 - 👋 exit
 """)
-
-
-# Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
 if "context" not in st.session_state:
     with st.sidebar:
-        st.subheader("👤 User Setup")
+        st.subheader("User Setup")
         name_input = st.text_input("Enter your name")
         uid_input = st.text_input("Enter your User ID (number)", value="1")
         if name_input and uid_input.isdigit():
             st.session_state.context = user_info(name=name_input, uid=int(uid_input))
-            st.success("✅ User context initialized.")
+            st.success("User context initialized.")
         else:
             st.warning("Please enter valid user info to begin.")
-
-# Display messages
+            
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# User input
+
 user_input = st.chat_input("Ask me anything about your health goals...")
 
 if user_input and "context" in st.session_state:
-    # Show user message
+    
     st.chat_message("user").markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    # Create placeholder for assistant reply
+    
     assistant_box = st.chat_message("assistant")
     assistant_stream = assistant_box.empty()
-    st.session_state.messages.append({"role": "assistant", "content": ""})  # Placeholder
+    st.session_state.messages.append({"role": "assistant", "content": ""}) 
 
     async def get_agent_response():
         result = Runner.run_streamed(

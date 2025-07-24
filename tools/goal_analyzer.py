@@ -46,9 +46,6 @@ async def goal_analyzer(context: RunContextWrapper[user_info],user_input: str) -
 
     return (
          f"🎯"
-        # Your goal is already set to: {context.goal['type'].replace('_', ' ').title()}.\n"
-        # "✅ Would you like help with anything else (like a meal plan, schedule, or nutrition)?\n"
-        # "Type your next request or say 'exit' to leave."
     )
    
     
