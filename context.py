@@ -1,10 +1,7 @@
-from dataclasses import dataclass
 from agents import RunContextWrapper,function_tool
 from pydantic import BaseModel
-
 from typing import Optional,List,Dict
 
-# @dataclass
 class user_info(BaseModel):
     name :str
     uid  :int
@@ -15,8 +12,7 @@ class user_info(BaseModel):
     injury_notes: Optional[str] = None
     handoff_logs: List[str] = []
     progress_logs: List[Dict[str, str]] = []
-
-
+    
     
 
 @function_tool

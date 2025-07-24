@@ -3,13 +3,13 @@ from agents import function_tool
 async def meal_planner(meal_plan:str) -> str:
     """
     A very simple and basic  Asian meal plans for difffernt diet types like
-    vegetarians, vegans , nonveg, glutenfree , highprotein .
+    vegetarian, vegans , nonveg, glutenfree , highprotein .
     """
-    # print("📦 meal_planner tool called with:", meal_plan)
+    
 
     plan_key = meal_plan.lower().replace( " " ,"")
     plans = {
-        "vegetarians": [
+        "vegetarian": [
             "Day 1: cabbage Soup + curd",
             "Day 2: Daal chawal + salad",
             "Day 3: Vegetable pulao + raita",

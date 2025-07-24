@@ -1,7 +1,7 @@
 import asyncio
 from openai.types.responses import ResponseTextDeltaEvent
 from runconfig import config
-from agents import Runner ,Agent 
+from agents import Runner, Agent
 from all_agents.escalation_agent import escalation_agent
 from all_agents.injurysupport_agent import injury_support_agent
 from all_agents.nutrition_agent import nutrition_agent
@@ -14,73 +14,84 @@ from context import user_info
 
 
 
-
-name_input = input("👤 Enter your name: ").strip()
-uid_input = input("🆔 Enter your User ID (just a number): ").strip()
-
-try:
-    uid = int(uid_input)
-except ValueError:
-    print("❌ Invalid UID. Please enter a numeric value.")
-    exit()
-
-context = user_info(name=name_input, uid=uid)
-
-
-Orchestrator_agent=Agent(
+Orchestrator_agent = Agent(
     name="Orchestrator_agent",
-    # instructions="""You are a health and wellness agent ,You use tools given to you to analyze goals,
-    # give users meal plans,schedule their revisit,give them work out and track their progress.If ask for
-    # multiple tsk you use tools and never perform any function .Always use provided tools """,
-    instructions="you are health wellness agent",    
-
-
-tools=[
-    escalation_agent.as_tool(
-        tool_name="give_escalation",
-        tool_description="""You  When a user wants to speak to a human trainer or coach,
-        you acknowledge their request and inform them that a real person will follow up shortly ."""
-),
-    injury_support_agent.as_tool(
-        tool_name="give_injurysupport",
-        tool_description="""Handles user request to examine physical issues.If user 
-        concerns about bones injury , jointPain, or any physical limitation ,you provide them with guidence 
-        and treatment """,
+    instructions=(
+        "1.Ask about goals by using goal_analyzer tool,fitness level, meal plans, injury support, workout or any challenges."
+        "Please choose your goal category:\n"
+        "- 🍽️ Nutrition Diet / Meal Planner\n"
+        "- 🏥 Fitness Training / Gym / Workout\n"
+        "- 🧠 Mental Health\n"
+        "- 🤕 Injury Support\n"
+        "- 👋 exit"
+        "2. Analyze input to determine the most appropriate support."
+        "3. Use tools if needed: Goal Analyzer, Meal Planner, Workout Recommender, etc."
+        "4. Hand off to specialized agents when appropriate: NutritionExpertAgent, InjurySupportAgent, EscalationAgent"
     ),
-    nutrition_agent.as_tool(
-        tool_name="give_nutrition",
-        tool_description="""you guide user about their diet plans by taking plans from meal planner,Handles users 
-        with special dietary needs such as diabetes, allergies, or gluten intolerance."""
-
-    ),
-    goal_analyzer,
-    meal_planner,
-    schedule,
-    progress_tracker,
-    workout_plan 
-],
-
-handoffs=[
-    escalation_agent,
-    nutrition_agent,
-    injury_support_agent
-  
-]
+        
+    tools=[
+        escalation_agent.as_tool(
+            tool_name="give_escalation",
+            tool_description="Handles requests to speak with a human coach."
+        ),
+        injury_support_agent.as_tool(
+            tool_name="give_injurysupport",
+            tool_description="Supports users with injury concerns like joint pain or muscle issues."
+        ),
+        nutrition_agent.as_tool(
+            tool_name="give_nutrition",
+            tool_description="Provides diet guidance using meal planning tools."
+        ),
+        goal_analyzer,
+        meal_planner,
+        schedule,
+        progress_tracker,
+        workout_plan
+    ],
 )
 
+
+
 async def main():
-    result=Runner.run_streamed(
-        Orchestrator_agent,
-        input="I want to get guided with wellness agent about fitness and health",
-        run_config=config,
-        context= context
+    name_input = input("Enter your name: ").strip()
+    uid_input = input("Enter your User ID (just a number): ").strip()
+    try:
+        uid=int(uid_input)
+    except ValueError:
+        print("❌ Invalid UID. Please enter a numeric value.")
+        return
+    
+        
+    context = user_info(name=name_input, uid=uid)
+
+    print("\n💬 Welcome to the Health & Wellness Planner!")
+    
+    print(""" 
+        Please choose your goal category
+        🍽️ Nutrition Diet / Meal Planner
+        🏥 Fitness Training / Gym / Workou
+        🧠 Mental Health
+        🤕 Injury Support
+        👋 exit
+""")
+
+    while True:
+        user_input = input("You: ").strip()
+        if user_input.lower() in {"exit", "quit"}:
+            print("👋 Goodbye! Take care.")
+            break
+        result = Runner.run_streamed(
+            Orchestrator_agent,
+            input=user_input,
+            run_config=config,
+            context=context
         )
-    
-    
-    async for event in result.stream_events():
-        if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-            print(event.data.delta, end="", flush=True)
-    
+        full_response = ""
+        async for event in result.stream_events():
+            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+                delta = event.data.delta
+                print(delta, end="", flush=True)
+                full_response += delta
+        print() 
 if __name__ == "__main__":
     asyncio.run(main())
-
