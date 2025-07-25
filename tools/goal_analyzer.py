@@ -33,8 +33,8 @@ async def goal_analyzer(context: RunContextWrapper[user_info],user_input: str) -
             context.goal["type"] = "injury support"
             return "✅ Goal set: injury support."
         elif any(word in user_input for word in ["mental", "stress", "depression", "anxiety"]):
-            context.goal["type"] = "mental support"
-            return "✅ Goal set: Mental Health."
+            context.goal["type"] = "mental health"
+            return "✅ Goal set: mental health."
         elif "exit" in user_input:
             context.goal["type"] = "exit"
             return("👋bye")
