@@ -108,10 +108,8 @@ from tools.meal_planner import meal_planner
 from tools.scheduler import schedule
 from tools.tracker import progress_tracker
 from tools.workout_recommender import workout_plan
-from utils.streaming import stream_agent_response  # ✅ Import streaming helper
+from utils.streaming import stream_agent_response  
 
-
-# ✅ Define your Orchestrator_agent here (no need to move to another file)
 Orchestrator_agent = Agent(
     name="Orchestrator_agent",
     instructions=(
