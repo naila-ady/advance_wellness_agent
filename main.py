@@ -98,7 +98,7 @@
 
 import asyncio
 from runconfig import config
-from agents import Runner, Agent
+from agents import Runner, Agent,enable_verbose_stdout_logging,set_tracing_disabled,ModelSettings
 from context import user_info
 from all_agents.escalation_agent import escalation_agent
 from all_agents.injurysupport_agent import injury_support_agent
@@ -108,22 +108,47 @@ from tools.meal_planner import meal_planner
 from tools.scheduler import schedule
 from tools.tracker import progress_tracker
 from tools.workout_recommender import workout_plan
-from utils.streaming import stream_agent_response  
+from utils.streaming import stream_agent_response
+from hooks import hooks 
 
-Orchestrator_agent = Agent(
-    name="Orchestrator_agent",
+
+# enable_verbose_stdout_logging()
+# set_tracing_disabled(disabled=True)
+
+Orchestrator_agent= Agent(
+    name="Health_wellness_Agent",
+    # instructions=(
+        # "1. Ask about goals by using goal_analyzer tool, fitness level, meal plans, injury support, workout or any challenges.\n"
+        # "2. Analyze input to determine the most appropriate support.\n"
+        # "3. Use tools if needed: Goal Analyzer, Meal Planner, Workout Recommender, etc.\n"
+        # "4. Hand off to specialized agents when appropriate: NutritionExpertAgent, InjurySupportAgent, EscalationAgent.\n"
     instructions=(
-        "1. Ask about goals by using goal_analyzer tool, fitness level, meal plans, injury support, workout or any challenges.\n"
-        "2. Analyze input to determine the most appropriate support.\n"
-        "3. Use tools if needed: Goal Analyzer, Meal Planner, Workout Recommender, etc.\n"
-        "4. Hand off to specialized agents when appropriate: NutritionExpertAgent, InjurySupportAgent, EscalationAgent.\n"
-        "Please choose your goal category:\n"
-        "- 🍽️ Nutrition Diet / Meal Planner\n"
-        "- 🏥 Fitness Training / Gym / Workout\n"
-        "- 🧠 Mental Health\n"
-        "- 🤕 Injury Support\n"
-        "- 👋 exit"
-    ),
+            "You're a wellness assistant helping users with fitness, nutrition, and recovery.\n"
+            "1. First, use `goal_analyzer` to understand the user's wellness goal.\n"
+            "2. Then according to user goal, use other tools:\n"
+            "- Use `meal_planner` for meal planning.\n"
+            "- Use `schedule` to schedule health activities.\n"
+            "- Use `progress_tracker` to track user's health journey.\n"
+            "- 🏋️‍♂️ Use `workout_plan` when the user says 'beginner', 'advanced', 'gym', 'workout', 'fitness routine', or asks for a fitness plan.\n"
+            "- Use `give_nutrition` for dietary goals.\n"
+            "- Use `give_injurysupport` for pain, injury, or joint issues.\n"
+            "- Use `give_escalation` if they want to speak with a human coach.\n"
+            "Be proactive — prefer tools over answering yourself."
+            "Please choose your goal category:\n"
+            "- 🍽️ Nutrition Diet / Meal Planner\n"
+            "- 🏥 Fitness Training / Gym / Workout\n"
+            "- 🧠 Mental Health\n"
+            "- 🤕 Injury Support\n"
+            "- 👋 exit"
+            ),
+    # instructions=(
+    #             # "if User: I want to lose 5kg in 2 months, transfer to workout_recommender "
+    #             # "if User: I’m vegetarian transfer to MealPlannerTool provides meal plans after asking their choice"
+    #     ),
+            
+    
+        
+        
     tools=[
         escalation_agent.as_tool(
             tool_name="give_escalation",
@@ -143,8 +168,11 @@ Orchestrator_agent = Agent(
         progress_tracker,
         workout_plan
     ],
-)
+        model_settings=ModelSettings(tool_choice="required"),
+        reset_tool_choice=True
+    )
 
+conversation_state = {}
 
 async def main():
     name_input = input("Enter your name: ").strip()
@@ -155,7 +183,9 @@ async def main():
         print("❌ Invalid UID. Please enter a numeric value.")
         return
 
-    context = user_info(name=name_input, uid=uid)
+    context = user_info(name=name_input, uid=uid,conversation_state={})
+    
+
 
     print("\n💬 Welcome to the Health & Wellness Planner!")
     print(""" 
@@ -165,7 +195,7 @@ async def main():
         🧠 Mental Health
         🤕 Injury Support
         👋 exit
-""")
+    """)
 
     while True:
         user_input = input("You: ").strip()
@@ -176,8 +206,10 @@ async def main():
         result = Runner.run_streamed(
             Orchestrator_agent,
             input=user_input,
+            hooks=hooks,
             run_config=config,
-            context=context
+            context=context,
+            
         )
 
         await stream_agent_response(result)

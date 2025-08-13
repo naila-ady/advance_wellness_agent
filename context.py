@@ -12,6 +12,7 @@ class user_info(BaseModel):
     injury_notes: Optional[str] = None
     handoff_logs: List[str] = []
     progress_logs: List[Dict[str, str]] = []
+    conversation_state: Dict = {} 
     
     
 

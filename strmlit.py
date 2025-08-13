@@ -97,3 +97,4 @@ if user_input and "context" in st.session_state:
 
 elif user_input:
     st.warning("⚠️ Please enter user name and ID in the sidebar first.")
+
